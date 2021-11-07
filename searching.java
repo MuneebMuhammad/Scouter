@@ -18,11 +18,11 @@ import java.util.*;
 import java.sql.*;
 
 public class Project extends Application{
-    private Statement stmt;	
+    private Statement stmt;
     public void start(Stage primaryStage){
-	initializeDB();
+        initializeDB();
         Button btSearch = new Button("Search");
-        Label nm = new Label("Name:");
+        Label nm = new Label("File Name:");
         Label pb = new Label("Prepared by:");
         Label yr = new Label("Year");
         Label ft = new Label("File Type:");
@@ -32,18 +32,36 @@ public class Project extends Application{
         ComboBox comboYear = new ComboBox();
         comboYear.getItems().addAll(2015, 2016, 2017, 2018, 2019, 2020, 2021);
         ComboBox comboPrep = new ComboBox();
-        comboPrep.getItems().addAll("Pdf", "Word", "PowerPoint", "mp3", "text");
+        comboPrep.getItems().addAll("Pdf", "Word", "PowerPoint", ""
+                + "mp3", "text");
         BorderPane mainPane = new BorderPane();
         mainPane.setPadding(new Insets(5));
         HBox titlePane = new HBox(5);
         titlePane.getChildren().addAll(nm, tfnm, yr, comboYear, ft, comboPrep, pb, tfpb, btSearch);
         mainPane.setTop(titlePane);
+         btSearch.setOnAction(e -> {
+            String nameChoose = tfnm.getText();
+            String yearChoose = comboYear.getValue().toString();
+            String typeChoose = comboPrep.getValue().toString();
+            String writerChoose = tfpb.getText();
+            System.out.println(typeChoose);
+            try{
+                String q = "Select * from dataa where fileType = '" + typeChoose + "'";
+                ResultSet rs = stmt.executeQuery(q);     
+                while(rs.next()){
+                    System.out.println(rs.getString("fileName"));
+                }
+            }
+            catch(SQLException ex){
+                ex.printStackTrace();
+            }
+        });
         Scene scene = new Scene(mainPane, 1000, 600);
         primaryStage.setTitle("Request Document");
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
-
+    } 
+    
     // sets up database connection
     public void initializeDB(){
         try{
@@ -51,7 +69,7 @@ public class Project extends Application{
             Class.forName("com.mysql.jdbc.Driver");
             // establish connection with a database
             Connection con = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/sakila", "root", "sns1234");
+            "jdbc:mysql://localhost:3306/filess", "root", "sns1234");
             // create a statement
             stmt = con.createStatement();
         }
@@ -62,23 +80,8 @@ public class Project extends Application{
     
     public static void main(String[] args) {
         Application.launch(args);
-    }       
+        
+    }
+    
+    
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
