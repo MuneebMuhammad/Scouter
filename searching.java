@@ -15,10 +15,12 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import java.util.*;
+import java.sql.*;
 
 public class Project extends Application{
-
+    private Statement stmt;	
     public void start(Stage primaryStage){
+	initializeDB();
         Button btSearch = new Button("Search");
         Label nm = new Label("Name:");
         Label pb = new Label("Prepared by:");
@@ -40,7 +42,23 @@ public class Project extends Application{
         primaryStage.setTitle("Request Document");
         primaryStage.setScene(scene);
         primaryStage.show();
-    } 
+    }
+
+    // sets up database connection
+    public void initializeDB(){
+        try{
+            // load jdbc driver
+            Class.forName("com.mysql.jdbc.Driver");
+            // establish connection with a database
+            Connection con = DriverManager.getConnection(
+            "jdbc:mysql://localhost:3306/sakila", "root", "sns1234");
+            // create a statement
+            stmt = con.createStatement();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
     
     public static void main(String[] args) {
         Application.launch(args);
