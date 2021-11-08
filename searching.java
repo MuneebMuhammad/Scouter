@@ -16,6 +16,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import java.util.*;
 import java.sql.*;
+import java.awt.Desktop;
+import java.io.*;
 
 public class Project extends Application{
     private Statement stmt;
@@ -78,10 +80,27 @@ public class Project extends Application{
         }
     }
     
-    public static void main(String[] args) {
-        Application.launch(args);
-        
+    // p is the path of the file and this file is opened by openFile if it exists
+    public void openFile(String p){
+        try{
+            File file = new File(p);
+            // check if Desktop is supported
+            if(!Desktop.isDesktopSupported()){
+                System.out.println("Desktop not supported");
+                return;
+            }
+            Desktop desktop = Desktop.getDesktop();
+            if(file.exists()){  // check if file exists
+                desktop.open(file); // open the file
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
     }
     
-    
+    public static void main(String[] args) {
+        Application.launch(args);
+
+    }
 }
