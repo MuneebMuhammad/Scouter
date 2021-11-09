@@ -1,5 +1,8 @@
 package project;
 
+import java.awt.Color;
+import javafx.scene.paint.*;
+import javafx.scene.canvas.*;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -7,7 +10,7 @@ import javafx.stage.Stage;
 import javafx.scene.layout.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.*;
-import javafx.scene.shape.Circle;
+import javafx.scene.shape.*;
 import javafx.scene.text.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -22,26 +25,60 @@ import java.io.*;
 public class Project extends Application{
     private Statement stmt;
     public void start(Stage primaryStage){
-        initializeDB();
+        
+        initializeDB(); // database initialized
+        
+        // all the nodes that are needed are declared here
         Button btSearch = new Button("Search");
-        Label nm = new Label("File Name:");
+        Button btRe = new Button("Reset");
+        Label nm = new Label("File:");
         Label pb = new Label("Prepared by:");
+        Label catg = new Label("Category:");
         Label yr = new Label("Year");
         Label ft = new Label("File Type:");
         Label space = new Label("       ");
         TextField tfnm = new TextField();
         TextField tfpb = new TextField();
+        ComboBox comboctg = new ComboBox();
         ComboBox comboYear = new ComboBox();
         comboYear.getItems().addAll(2015, 2016, 2017, 2018, 2019, 2020, 2021);
         ComboBox comboPrep = new ComboBox();
         comboPrep.getItems().addAll("Pdf", "Word", "PowerPoint", ""
                 + "mp3", "text");
+        comboctg.getItems().addAll("Comic", "Action", "Poetry", "Politics", "Geography", "History");
+        tfnm.setPromptText("File Name");
+        tfpb.setPromptText("Writer Name");
+        
+        // add design to the nodes
+        btSearch.setPrefSize(100, 60);
+        btRe.setPrefSize(100, 60);
+        Font f = new Font(21);
+        btSearch.setStyle("-fx-text-fill: white");
+        btRe.setStyle("-fx-text-fill: white");
+        btSearch.setBackground(new Background(new BackgroundFill(Paint.valueOf("green"), new CornerRadii(8), Insets.EMPTY)));
+        btRe.setBackground(new Background(new BackgroundFill(Paint.valueOf("red"), new CornerRadii(8), Insets.EMPTY)));
+        btSearch.setFont(f.font("verdana", FontWeight.SEMI_BOLD, 18));
+        btRe.setFont(f.font("verdana", FontWeight.SEMI_BOLD, 18));
+        
+        // set panes
         BorderPane mainPane = new BorderPane();
         mainPane.setPadding(new Insets(5));
         HBox titlePane = new HBox(5);
-        titlePane.getChildren().addAll(nm, tfnm, yr, comboYear, ft, comboPrep, pb, tfpb, btSearch);
+        titlePane.getChildren().addAll(nm, tfnm, yr, comboYear, ft, comboPrep, catg, comboctg, pb, tfpb, space, btSearch, btRe);
         mainPane.setTop(titlePane);
-         btSearch.setOnAction(e -> {
+        
+        // action when Reset button is clicked
+        btRe.setOnAction(e ->{
+            tfnm.clear();
+            tfpb.clear();
+            comboPrep.valueProperty().set(null);
+            comboYear.valueProperty().set(null);
+            comboctg.valueProperty().set(null);
+            
+        });
+        
+        // action when Seach button is clicked
+        btSearch.setOnAction(e -> {
             String nameChoose = tfnm.getText();
             String yearChoose = comboYear.getValue().toString();
             String typeChoose = comboPrep.getValue().toString();
@@ -58,7 +95,7 @@ public class Project extends Application{
                 ex.printStackTrace();
             }
         });
-        Scene scene = new Scene(mainPane, 1000, 600);
+        Scene scene = new Scene(mainPane, 1350, 600);
         primaryStage.setTitle("Request Document");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -101,6 +138,6 @@ public class Project extends Application{
     
     public static void main(String[] args) {
         Application.launch(args);
-
+        
     }
 }
