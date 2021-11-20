@@ -79,16 +79,40 @@ public class Project extends Application{
         
         // action when Seach button is clicked
         btSearch.setOnAction(e -> {
-            String nameChoose = tfnm.getText();
-            String yearChoose = comboYear.getValue().toString();
-            String typeChoose = comboPrep.getValue().toString();
-            String writerChoose = tfpb.getText();
-            System.out.println(typeChoose);
+            String nameChoose, yearChoose, typeChoose, writerChoose;
+            // check which conditions were selected and accordingly choose query 
+            if(tfnm.getText().isEmpty()){
+                nameChoose = "";
+            }
+            else {
+                nameChoose = tfnm.getText();
+            }
+            if(tfpb.getText().isEmpty()){
+                writerChoose = "";
+            }
+            else{
+                writerChoose = tfpb.getText();
+            }
+            if(comboYear.getSelectionModel().isEmpty()){
+                yearChoose = "";
+            }
+            else{
+                yearChoose = comboYear.getValue().toString();
+            }
+            if(comboPrep.getSelectionModel().isEmpty()){
+                typeChoose = "";
+            }
+            else{
+                typeChoose = comboPrep.getValue().toString();
+            }
+            
             try{
-                String q = "Select * from dataa where fileType = '" + typeChoose + "'";
+                String q = "Select * from dataa where fileType LIKE '%" + typeChoose + "%' and fileName like '%" + nameChoose + "%' and madeBy like '%" + writerChoose 
+                        + "%' and dateYear like '%" + yearChoose + "%'";
+                System.out.println(q);
                 ResultSet rs = stmt.executeQuery(q);     
                 while(rs.next()){
-                    System.out.println(rs.getString("fileName"));
+                    System.out.println(rs.getString("fileName") + " " + rs.getString("fileType") + " " + rs.getString("madeBy") + " " + rs.getString("dateYear"));
                 }
             }
             catch(SQLException ex){
