@@ -35,15 +35,15 @@ public class Project extends Application{
         Label pb = new Label("Prepared by:");
         Label catg = new Label("Category:");
         Label yr = new Label("Year");
-        Label ft = new Label("File Type:");
+        Label ft = new Label("File Extension:");
         Label space = new Label("       ");
         TextField tfnm = new TextField();
         TextField tfpb = new TextField();
         ComboBox comboctg = new ComboBox();
         ComboBox comboYear = new ComboBox();
         comboYear.getItems().addAll(2015, 2016, 2017, 2018, 2019, 2020, 2021);
-        ComboBox comboPrep = new ComboBox();
-        comboPrep.getItems().addAll("Pdf", "Word", "PowerPoint", ""
+        ComboBox comboext = new ComboBox();
+        comboext.getItems().addAll("Pdf", "Word", "PowerPoint", ""
                 + "mp3", "text");
         comboctg.getItems().addAll("Comic", "Action", "Poetry", "Politics", "Geography", "History");
         tfnm.setPromptText("File Name");
@@ -64,14 +64,14 @@ public class Project extends Application{
         BorderPane mainPane = new BorderPane();
         mainPane.setPadding(new Insets(5));
         HBox titlePane = new HBox(5);
-        titlePane.getChildren().addAll(nm, tfnm, yr, comboYear, ft, comboPrep, catg, comboctg, pb, tfpb, space, btSearch, btRe);
+        titlePane.getChildren().addAll(nm, tfnm, yr, comboYear, ft, comboext, catg, comboctg, pb, tfpb, space, btSearch, btRe);
         mainPane.setTop(titlePane);
         
         // action when Reset button is clicked
         btRe.setOnAction(e ->{
             tfnm.clear();
             tfpb.clear();
-            comboPrep.valueProperty().set(null);
+            comboext.valueProperty().set(null);
             comboYear.valueProperty().set(null);
             comboctg.valueProperty().set(null);
             
@@ -79,7 +79,7 @@ public class Project extends Application{
         
         // action when Seach button is clicked
         btSearch.setOnAction(e -> {
-            String nameChoose, yearChoose, typeChoose, writerChoose;
+            String nameChoose, yearChoose, typeChoose, writerChoose, ctgChoose;
             // check which conditions were selected and accordingly choose query 
             if(tfnm.getText().isEmpty()){
                 nameChoose = "";
@@ -99,20 +99,27 @@ public class Project extends Application{
             else{
                 yearChoose = comboYear.getValue().toString();
             }
-            if(comboPrep.getSelectionModel().isEmpty()){
+            if(comboext.getSelectionModel().isEmpty()){
                 typeChoose = "";
             }
             else{
-                typeChoose = comboPrep.getValue().toString();
+                typeChoose = comboext.getValue().toString();
+            }
+            if(comboctg.getSelectionModel().isEmpty()){
+                ctgChoose = "";
+            }
+            else{
+                ctgChoose = comboctg.getValue().toString();
             }
             
             try{
-                String q = "Select * from dataa where fileType LIKE '%" + typeChoose + "%' and fileName like '%" + nameChoose + "%' and madeBy like '%" + writerChoose 
-                        + "%' and dateYear like '%" + yearChoose + "%'";
+                String q = "Select * from files where fileName LIKE '%" + nameChoose + "%' and file_category like '%" + ctgChoose + "%' and author like '%" + writerChoose 
+                        + "%' and date_created like '%" + yearChoose + "%' and file_extension like '%" + typeChoose + "%'";
                 System.out.println(q);
-                ResultSet rs = stmt.executeQuery(q);     
+                ResultSet rs = stmt.executeQuery(q);  
                 while(rs.next()){
-                    System.out.println(rs.getString("fileName") + " " + rs.getString("fileType") + " " + rs.getString("madeBy") + " " + rs.getString("dateYear"));
+                    System.out.println(rs.getString("fileName") + " " + rs.getString("file_category") + " " + rs.getString("file_extension") + " " + 
+                            rs.getString("date_created") + " " + rs.getString("author"));
                 }
             }
             catch(SQLException ex){
@@ -132,7 +139,7 @@ public class Project extends Application{
             Class.forName("com.mysql.jdbc.Driver");
             // establish connection with a database
             Connection con = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/filess", "root", "sns1234");
+            "jdbc:mysql://localhost:3306/file_management", "root", "sns1234");
             // create a statement
             stmt = con.createStatement();
         }
@@ -142,7 +149,8 @@ public class Project extends Application{
     }
     
     // p is the path of the file and this file is opened by openFile if it exists
-    public void openFile(String p){
+    public static void openFile(String p){
+        // the path provided should have double '\\' e.g: c:\\Desktop\\Computer\\file.txt
         try{
             File file = new File(p);
             // check if Desktop is supported
