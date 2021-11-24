@@ -21,9 +21,17 @@ import java.util.*;
 import java.sql.*;
 import java.awt.Desktop;
 import java.io.*;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 public class Project extends Application{
     private Statement stmt;
+    private final TableView<FileInfo> table = new TableView<FileInfo>();
+    
+    private final ObservableList<FileInfo> data = FXCollections.observableArrayList();
     public void start(Stage primaryStage){
         
         initializeDB(); // database initialized
@@ -36,6 +44,11 @@ public class Project extends Application{
         Label catg = new Label("Category:");
         Label yr = new Label("Year");
         Label ft = new Label("File Extension:");
+        Label fileNameOut = new Label();
+        Label CtgOut = new Label();
+        Label ExtOut = new Label();
+        Label dateOut = new Label();
+        Label authorOut = new Label();
         Label space = new Label("       ");
         TextField tfnm = new TextField();
         TextField tfpb = new TextField();
@@ -48,6 +61,23 @@ public class Project extends Application{
         comboctg.getItems().addAll("Comic", "Action", "Poetry", "Politics", "Geography", "History");
         tfnm.setPromptText("File Name");
         tfpb.setPromptText("Writer Name");
+        TableColumn fileNamecol = new TableColumn("File Name");
+        TableColumn file_categorycol = new TableColumn("File Category");
+        TableColumn authorcol = new TableColumn("Author");
+        TableColumn date_createdcol = new TableColumn("Year");
+        TableColumn file_extensioncol = new TableColumn("File extension");
+        fileNamecol.setCellValueFactory(new PropertyValueFactory<FileInfo,String>("fileName"));
+        file_categorycol.setCellValueFactory(new PropertyValueFactory<FileInfo,String>("file_category"));
+        authorcol.setCellValueFactory(new PropertyValueFactory<FileInfo,String>("author"));
+        date_createdcol.setCellValueFactory(new PropertyValueFactory<FileInfo,String>("date_created"));
+        file_extensioncol.setCellValueFactory(new PropertyValueFactory<FileInfo,String>("file_extension"));
+        fileNamecol.setMinWidth(100);
+        file_categorycol.setMinWidth(100);
+        authorcol.setMinWidth(100);
+        date_createdcol.setMinWidth(100);
+        file_extensioncol.setMinWidth(150);
+        table.setItems(data);
+        table.getColumns().addAll(fileNamecol, file_categorycol, authorcol, date_createdcol, file_extensioncol);
         
         // add design to the nodes
         btSearch.setPrefSize(100, 60);
@@ -63,23 +93,30 @@ public class Project extends Application{
         // set panes
         BorderPane mainPane = new BorderPane();
         mainPane.setPadding(new Insets(5));
+        
         HBox titlePane = new HBox(5);
         titlePane.getChildren().addAll(nm, tfnm, yr, comboYear, ft, comboext, catg, comboctg, pb, tfpb, space, btSearch, btRe);
         mainPane.setTop(titlePane);
-        
+        mainPane.setCenter(table);
+        table.setEditable(true);
         // action when Reset button is clicked
         btRe.setOnAction(e ->{
+            for(int i = 0; i < table.getItems().size(); i++){
+                table.getItems().clear();
+            }
             tfnm.clear();
             tfpb.clear();
             comboext.valueProperty().set(null);
             comboYear.valueProperty().set(null);
             comboctg.valueProperty().set(null);
-            
         });
         
         // action when Seach button is clicked
         btSearch.setOnAction(e -> {
             String nameChoose, yearChoose, typeChoose, writerChoose, ctgChoose;
+            for(int i = 0; i < table.getItems().size(); i++){
+                table.getItems().clear();
+            }
             // check which conditions were selected and accordingly choose query 
             if(tfnm.getText().isEmpty()){
                 nameChoose = "";
@@ -115,12 +152,12 @@ public class Project extends Application{
             try{
                 String q = "Select * from files where fileName LIKE '%" + nameChoose + "%' and file_category like '%" + ctgChoose + "%' and author like '%" + writerChoose 
                         + "%' and date_created like '%" + yearChoose + "%' and file_extension like '%" + typeChoose + "%'";
-                System.out.println(q);
                 ResultSet rs = stmt.executeQuery(q);  
                 while(rs.next()){
-                    System.out.println(rs.getString("fileName") + " " + rs.getString("file_category") + " " + rs.getString("file_extension") + " " + 
-                            rs.getString("date_created") + " " + rs.getString("author"));
+                    data.add(new FileInfo(rs.getString("fileName"), rs.getString("file_category"), rs.getString("author"),
+                            rs.getString("date_created"), rs.getString("file_extension")));
                 }
+                
             }
             catch(SQLException ex){
                 ex.printStackTrace();
@@ -170,6 +207,63 @@ public class Project extends Application{
     
     public static void main(String[] args) {
         Application.launch(args);
+        
+    }
+    
+    public static class FileInfo{
+        private final SimpleStringProperty fileName;
+        private final SimpleStringProperty file_category;
+        private final SimpleStringProperty author;
+        private final SimpleStringProperty date_created;
+        private final SimpleStringProperty file_extension;
+
+        public FileInfo(String fileName, String file_category, String author, String date_created, String file_extension) {
+            this.fileName = new SimpleStringProperty(fileName);
+            this.file_category = new SimpleStringProperty(file_category);
+            this.author = new SimpleStringProperty(author);
+            this.date_created = new SimpleStringProperty(date_created);
+            this.file_extension = new SimpleStringProperty(file_extension);
+        }
+       
+        public String getFileName() {
+            return fileName.get();
+        }
+
+        public void setFileName(String fileName) {
+            this.fileName.set(fileName);
+        }
+
+        public String getFile_category() {
+            return file_category.get();
+        }
+
+        public void setFile_category(String file_category) {
+            this.file_category.set(file_category);
+        }
+
+        public String getAuthor() {
+            return author.get();
+        }
+
+        public void setAuthor(String author) {
+            this.author.set(author);
+        }
+
+        public String getDate_created() {
+            return date_created.get();
+        }
+
+        public void setDate_created(String date_created) {
+            this.date_created.set(date_created);
+        }
+
+        public String getFile_extension() {
+            return file_extension.get();
+        }
+
+        public void setFile_extension(String file_extension) {
+            this.file_extension.set(file_extension);
+        }
         
     }
 }
