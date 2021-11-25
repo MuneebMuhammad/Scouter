@@ -37,6 +37,7 @@ public class Project extends Application{
         initializeDB(); // database initialized
         
         // all the nodes that are needed are declared here
+        Button linkbt[] = new Button[10];
         Button btSearch = new Button("Search");
         Button btRe = new Button("Reset");
         Label nm = new Label("File:");
@@ -92,18 +93,22 @@ public class Project extends Application{
         
         // set panes
         BorderPane mainPane = new BorderPane();
-        mainPane.setPadding(new Insets(5));
-        
+        mainPane.setPadding(new Insets(5));        
         HBox titlePane = new HBox(5);
         titlePane.getChildren().addAll(nm, tfnm, yr, comboYear, ft, comboext, catg, comboctg, pb, tfpb, space, btSearch, btRe);
+        HBox btTable = new HBox(2);        
+        GridPane gp = new GridPane();
+        gp.setPrefHeight(10);
+        btTable.getChildren().addAll(table, gp);
         mainPane.setTop(titlePane);
-        mainPane.setCenter(table);
+        mainPane.setCenter(btTable);        
         table.setEditable(true);
         // action when Reset button is clicked
         btRe.setOnAction(e ->{
             for(int i = 0; i < table.getItems().size(); i++){
                 table.getItems().clear();
             }
+            
             tfnm.clear();
             tfpb.clear();
             comboext.valueProperty().set(null);
@@ -152,12 +157,18 @@ public class Project extends Application{
             try{
                 String q = "Select * from files where fileName LIKE '%" + nameChoose + "%' and file_category like '%" + ctgChoose + "%' and author like '%" + writerChoose 
                         + "%' and date_created like '%" + yearChoose + "%' and file_extension like '%" + typeChoose + "%'";
-                ResultSet rs = stmt.executeQuery(q);  
+                ResultSet rs = stmt.executeQuery(q); 
+                int i = 0;  
+                gp.add(new Button("Links"), 0, 0);
                 while(rs.next()){
                     data.add(new FileInfo(rs.getString("fileName"), rs.getString("file_category"), rs.getString("author"),
                             rs.getString("date_created"), rs.getString("file_extension")));
-                }
-                
+                            String paths = rs.getString("path");
+                            linkbt[i] = new Button();
+                            linkbt[i].setOnAction(kk->openFile(paths));
+                            gp.add(linkbt[i], 0, i+1);
+                            i++;
+                }                
             }
             catch(SQLException ex){
                 ex.printStackTrace();
@@ -267,3 +278,4 @@ public class Project extends Application{
         
     }
 }
+
