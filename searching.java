@@ -105,8 +105,12 @@ public class Project extends Application{
         table.setEditable(true);
         // action when Reset button is clicked
         btRe.setOnAction(e ->{
-            for(int i = 0; i < table.getItems().size(); i++){
-                table.getItems().clear();
+            int ll = table.getItems().size();
+            table.getItems().clear();  // remove table
+            for(int i = 0; i < ll; i++){
+                // remove buttons
+                linkbt[i].setVisible(false);  
+                linkbt[i].setManaged(false);
             }
             
             tfnm.clear();
@@ -119,8 +123,12 @@ public class Project extends Application{
         // action when Seach button is clicked
         btSearch.setOnAction(e -> {
             String nameChoose, yearChoose, typeChoose, writerChoose, ctgChoose;
-            for(int i = 0; i < table.getItems().size(); i++){
-                table.getItems().clear();
+            int ll = table.getItems().size();
+            table.getItems().clear(); // remove table
+            for(int i = 0; i < ll; i++){
+                // remove buttons
+                linkbt[i].setVisible(false);  
+                linkbt[i].setManaged(false);
             }
             // check which conditions were selected and accordingly choose query 
             if(tfnm.getText().isEmpty()){
@@ -216,11 +224,7 @@ public class Project extends Application{
         }
     }
     
-    public static void main(String[] args) {
-        Application.launch(args);
-        
-    }
-    
+     // this class is used to store information of files in TableView
     public static class FileInfo{
         private final SimpleStringProperty fileName;
         private final SimpleStringProperty file_category;
@@ -277,5 +281,29 @@ public class Project extends Application{
         }
         
     }
+    
+    public static void main(String[] args) {
+        Application.launch(args);
+        
+    }
+    
+   
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
